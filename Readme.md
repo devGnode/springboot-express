@@ -181,6 +181,27 @@ Run :
 MasterController.getInstance().config().listen();
 ````
 
+###Authorization
+
+Endpoint user authorization :
+
+|  NAME | VALUE |
+|:---|:---:|
+| ALL | 0x00 |
+| ADMIN | 0x01 |
+| OPERATOR | 0x02 |
+| SELLER | 0x04 |
+| CUSTOMER | 0x08 |
+
+- `GetMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
+- `PostMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
+- `PutMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL) `
+- `DeleteMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
+- `function HeadMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
+
+### MiddleWare
+
+- `jsonBodyParser( ):this` : body-parser middleware
 
 ## :octocat: From git
 
