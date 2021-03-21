@@ -106,11 +106,6 @@ Protected properties :
 
 Methods :
 
-public setBaseUrl( baseUrl:string ): ExpressSpringApp{
-this.baseUrl = baseUrl;
-return this;
-}
-
 - `getBaseUrl( ):string` :
 - `getApp( ):express.Application` : Express application handler
 - `getMiddleWare(): MiddleWare` : Express middleware
@@ -181,7 +176,7 @@ Run :
 MasterController.getInstance().config().listen();
 ````
 
-###Authorization
+### Authorization
 
 Endpoint user authorization :
 
@@ -202,12 +197,50 @@ Endpoint user authorization :
 ### MiddleWare
 
 - `jsonBodyParser( ):this` : body-parser middleware
+- `cookieParser` : is not rpm cookie-parser. Home made cookie parser
+
+Define your middleware in your config method from your master class controller
 
 ````typescript
 public config( ):ExpressSpringApplicationImpl{
-    this.getMiddleWare().jsonBodyParser();
+    this.getMiddleWare()
+        .jsonBodyParser()
+        .cookieParser();
     /*....*/
 }
+````
+
+### Cookie Parsing
+
+Enabled from your middleware config : `cookieParser()`
+
+Get cookie from callback :
+
+- property : spring_boot
+
+> get cookie by this way : req["spring_boot"]
+
+````typescript
+    import {List} from "lib-utils-ts/src/Interface";
+    import {Cookie} from "lib-utils-ts/src/net/Cookie";
+    /*...*/
+    /*...*/
+    @Spring.GetMapping("/v1/getCookie")
+    public static firstFactorConnection(req: Request, res: Response):void{
+        let cookie: List<Cookie> = new ArrayList(req["spring_boot"]);
+
+        cookie.stream().each((value:Cookie)=>{
+            console.log( value.getName() )
+        });
+        // getCookie
+        cookie.stream()
+            .filter(cookie=>cookie.getName().equals("myCookie"))
+            .findFirst()
+            .orElse(null);
+        
+        res.send("<html>OK</html>");
+    }
+    
 ````
 
 ## :octocat: From git
