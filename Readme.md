@@ -8,12 +8,21 @@
 
 `npm i springboot-express`
 
+## Usage
 
-### Usage
+Springboot-express allows of use express as springboot java but to minima. For use it you need to enabled `experimentalDecorators`
+property in your tsconfig.json as this framework use the annotations expressions, and as saying official documentation of typescript.
+Decorators are a stage 2 proposal for JavaScript and are available as an experimental feature of TypeScript. Springboot-express use
+Express framework as environment.
 
-For use Springboot-express you need to enabled `experimentalDecorators` property in your tsconfig.json as this framework
-use the annotations expressions, warning Decorators are a stage 2 proposal for JavaScript and are available as an experimental
-feature of TypeScript. Springboot-express use Express framework as environment.
+### Annotation 
+
+- `@Spring.GetMapping( endpoint: string [, authLevel  ] )`
+- `@Spring.PostMapping( endpoint: string [, authLevel  ]  )`
+- `@Spring.PutMapping( endpoint: string [, authLevel  ]  )`
+- `@Spring.DeleteMapping( endpoint: string [, authLevel  ]  )`
+- `@Spring.HeadMapping( endpoint: string [, authLevel  ]  )`
+
 
 ### Configuration file
 
@@ -36,7 +45,7 @@ Only for these properties, if they are not declared here is their value by defau
 - port : `80`
 - sslPort : `443`
 
-These parameters are obligatory and essential :
+These parameters are mandatory and essential :
 
 - **pagesDirectory**
 - httpProtocol : `boolean`
@@ -115,9 +124,9 @@ Methods :
 
 If you have somme importation error with `pagesDirectory` properties declare these properties here as below :
 
-````typescript
+> PropertiesConfig.getInstance().setProperty("pagesDirectory", process.cwd()+"/src/pages" );
 
-PropertiesConfig.getInstance().setProperty("pagesDirectory", process.cwd()+"/src/pages" );
+````typescript
 
 export class MasterController extends ExpressSpringApp{
 
@@ -192,7 +201,7 @@ Endpoint user authorization :
 - `PostMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
 - `PutMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL) `
 - `DeleteMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
-- `function HeadMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
+- `HeadMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
 
 ### MiddleWare
 
