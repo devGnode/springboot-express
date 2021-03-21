@@ -16,7 +16,7 @@ export class Application implements SpringApplication{
 
     private static readonly INSTANCE: Application = new Application();
 
-    private logger:Logger  = Logger.factory(Application.class().name);
+    private logger:Logger  = Logger.factory(Application.name);
     private loaded:boolean = false;
     private readonly app: express.Application;
 
@@ -44,7 +44,7 @@ export class Application implements SpringApplication{
             .map(value=> value.explodeAsList(".").get(0) )
             .each(value=>{
                 import(`${pages_directory}/${value}`);
-                this.logger.debug(`import : ${pages_directory}/${value} page`)
+                this.logger.debug(`import : ${pages_directory}/${value} page`);
             });
        // Logger.setLogStdout(true);
         this.loaded=true;
