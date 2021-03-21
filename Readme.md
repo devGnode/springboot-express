@@ -203,6 +203,13 @@ Endpoint user authorization :
 
 - `jsonBodyParser( ):this` : body-parser middleware
 
+````typescript
+public config( ):ExpressSpringApplicationImpl{
+    this.getMiddleWare().jsonBodyParser();
+    /*....*/
+}
+````
+
 ## :octocat: From git
 
 ``
