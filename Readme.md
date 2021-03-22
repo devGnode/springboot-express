@@ -23,6 +23,9 @@ Express framework as environment.
 - `@Spring.DeleteMapping( endpoint: string [, authLevel  ]  )`
 - `@Spring.HeadMapping( endpoint: string [, authLevel  ]  )`
 
+
+-  `@Spring.Configuration( path: string  )` : don't support singleton pattern
+
 ### Steps
 
 - Configuration Properties
@@ -76,6 +79,27 @@ Run with from your owns properties file configuration :
 
 ````typescript
 this.loadProperties(process.cwd()+"/src/config/config.json");
+````
+
+Run with annotation :
+
+Put this annotation at the top of your master class controller. This annotation don't support singleton pattern !!
+
+> @Spring.Configuration( path: string  )
+
+````typescript
+@Spring.Configuration( path: string  )
+export class MasterController extends ExpressSpringApp{
+
+    constructor() {
+        super();
+    }
+
+    public config():MasterController{
+        // your config middleware .... beforeRunCallback ...
+        return this;
+    }
+}
 ````
 
 Run with from owns properties class 
@@ -181,6 +205,8 @@ export class MasterController extends ExpressSpringApp{
 
 Pages :
 
+Static Pages Handler: 
+
 `````typescript
 
 export class Authentication {
@@ -213,10 +239,44 @@ export class Authentication {
 
 `````
 
+Instantiated object
+
+`````typescript
+
+@Spring.Instance
+export class Authentication {
+
+    private foo:string ="authorized secret passphrase";
+    private pass:boolean = true;
+    
+    @Spring.GetMapping("/v1/instance")
+    public static firstFactorConnection(req: Request, res: Response):void{
+        this.pass = true;
+        res.json({ bar: this.foo });
+    }
+
+    @Spring.PostMapping("/v1/instance/foo")
+    public static secondFactorConnection(req: Request, res: Response):void{
+        if(!this.pass){
+            res.status(401).json({ status: "Unauthorized" });
+            return;
+        }
+        res.json({ bar: "foo-bar" });
+    }
+}
+
+`````
+
 # Open Server
 
 ````typescript
 MasterController.getInstance().config().initPages().listen();
+````
+
+If you want run the server when you have use `@Spring.Configuration` annotation you can use this trick :
+
+````typescript
+new MasterController().config().initPages().listen();
 ````
 
 ### Authorization
