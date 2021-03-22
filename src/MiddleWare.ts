@@ -69,7 +69,6 @@ export class MiddleWare{
                 jwt.verify( token, secret,(error,payload:string)=>{
                     if(error) return;
                     req["springboot_jwt_auth"] = payload;
-                    this.app.authJwtHasSuccess = true;
                 });
             }
             next();

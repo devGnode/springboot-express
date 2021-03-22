@@ -2,9 +2,8 @@ import * as express from "express";
 import {readdirSync} from "fs";
 import {ArrayList} from "lib-utils-ts/src/List";
 import {Predication} from "lib-utils-ts/src/Predication";
-import * as bodyParser from "body-parser";
 import * as https from "https";
-import {IPropertiesFile, IPropertiesFileA} from "lib-utils-ts/src/Interface";
+import {IPropertiesFile, IPropertiesFileA, List} from "lib-utils-ts/src/Interface";
 import {ExpressSpringApplicationImpl, SpringApplication} from "./Interfaces";
 import { Logger} from "logger20js-ts";
 import {MiddleWare} from "./MiddleWare";
@@ -12,23 +11,64 @@ import "lib-utils-ts/src/globalUtils";
 import {AbstractProperties, Properties, PropertiesJson} from "lib-utils-ts/src/file/Properties";
 import {RuntimeException} from "lib-utils-ts/src/Exception";
 /***
- *
+ * Proxy Class
 */
 export class Application implements SpringApplication{
 
     private static readonly INSTANCE: Application = new Application();
 
-    private logger:Logger  = Logger.factory(Application.name);
-    private loaded:boolean = false;
-    private readonly app: express.Application;
+    private readonly logger:Logger  = Logger.factory(Application.name);
 
-    constructor() {this.app = express();}
+    private readonly app: express.Application;
+    private prop:AbstractProperties<Object>;
+
+    private loaded:boolean = false;
+    private configFile:string;
+
+    private handler:List<Object> = new ArrayList();
+
+    constructor() {
+        Logger.setPattern("[%hours{yellow}] %T{w?yellow;e?red;d?green}/%name - %error");
+        Logger.setColorize(true);
+        Logger.setSaveLog(false);
+        this.app = express();
+    }
 
     public getApp( ):express.Application{return this.app;}
 
-    public setLogger(logger:any): Application{
-        this.logger = logger;
-        return this;
+    public addHandler( handler:Object ):Object{
+        if(!this.getHandler(handler.getClass().getName())) this.handler.add(handler);
+        return handler;
+    }
+    /****
+     *  @getHandler: get instance of Object declared by Spring when it mapping endpoint
+     * @param target
+     */
+    public getHandler( target: string ):Object{
+        return this.handler
+            .stream()
+            .filter(value => value.getClass().getName().equals(target))
+            .findFirst()
+            .orElse(null);
+    }
+
+    public setConfigFileName( path:string ):void{ this.configFile = path; }
+
+    public getConfigFileName(  ):string{ return this.configFile; }
+
+    public getProperties( ):Properties{ return this.prop; }
+
+    public loadConfiguration( path:string ):void{
+        if (!path && this.getConfigFileName()) this.loadConfiguration(this.getConfigFileName());
+        else {
+            try {
+                if (/json$/.test(path)) this.prop = new PropertiesJson();
+                else this.prop = new Properties();
+                this.prop.load(ExpressSpringApp.getClass().getResourcesAsStream(path));
+            } catch (e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public init( pages_directory:string ): SpringApplication{
@@ -39,6 +79,7 @@ export class Application implements SpringApplication{
         p1.test = (value)=>value.endsWith(".d.ts");
         p0.test = (value)=>value.endsWith(".ts");
 
+        if(pages_directory.equals("undefined"))new RuntimeException("No configuration found !")
         ArrayList.of(readdirSync(pages_directory))
             .stream()
             .filter(p0.and(p1.negate()))
@@ -62,29 +103,28 @@ export class Application implements SpringApplication{
 export abstract class ExpressSpringApp implements ExpressSpringApplicationImpl{
 
     private readonly applicationWrap: Application = Application.getInstance();
-    private static logger:Logger  = Logger.factory(Application.name);
+    private static readonly logger:Logger  = Logger.factory(Application.name);
 
-    private prop:AbstractProperties<Object>;
-    private propA:Properties;
+    private prop:AbstractProperties<Object> = Application.getInstance().getProperties();
 
     protected baseUrl:string = "/v1";
     protected middleWare: MiddleWare;
 
-    constructor( properties: IPropertiesFile<string, Object> = null ) {
+    protected constructor( properties: IPropertiesFile<string, Object> = null ) {
 
        if(properties){
            this.prop = <Properties>properties;
            this.baseUrl = <string>properties.getProperty("baseUrl", null );
-       }else{
+       }else if(!this.prop){
            // minimal Configuration
            this.prop = new Properties();
-           this.prop.setProperty("httpProtocol",true);
-           this.prop.setProperty("httpProtocol",false);
-           this.prop.setProperty("gateway","gateway");
-           this.prop.setProperty("loggerParser ",80);
-           this.prop.setProperty("port","[%hours{yellow}] %T{w?yellow;e?red;d?green}/%name - %error");
-           this.prop.setProperty("logEnabledColorize",true);
-           this.prop.setProperty("saveLog",false);
+           this.prop.setProperty("httpProtocol", true);
+           this.prop.setProperty("httpProtocol", false);
+           this.prop.setProperty("gateway", "gateway");
+           this.prop.setProperty("loggerParser ", 80);
+           this.prop.setProperty("loggerParser", "[%hours{yellow}] %T{w?yellow;e?red;d?green}/%name - %error");
+           this.prop.setProperty("logEnabledColorize", true);
+           this.prop.setProperty("saveLog", false);
        }
         this.middleWare = new MiddleWare(this);
     }
@@ -102,14 +142,9 @@ export abstract class ExpressSpringApp implements ExpressSpringApplicationImpl{
     /***
      * STEP 0
      */
-    public loadProperties( path:string ):ExpressSpringApplicationImpl{
-        try{
-            if(/json$/.test(path)) this.prop = new PropertiesJson();
-            else this.prop = new Properties();
-            this.prop.load(ExpressSpringApp.getClass().getResourcesAsStream(path));
-        }catch (e) {
-            throw new RuntimeException(e);
-        }
+    public loadProperties( path:string ):ExpressSpringApplicationImpl {
+        this.applicationWrap.loadConfiguration(path);
+        this.prop = this.applicationWrap.getProperties();
         return this;
     }
     /***
@@ -121,7 +156,7 @@ export abstract class ExpressSpringApp implements ExpressSpringApplicationImpl{
     /***
      * STEP 2
      */
-    initPages():ExpressSpringApplicationImpl{
+    public initPages():ExpressSpringApplicationImpl{
         this.applicationWrap.init(String(this.prop.getProperty("pagesDirectory")));
         return this;
     }
@@ -157,5 +192,4 @@ export abstract class ExpressSpringApp implements ExpressSpringApplicationImpl{
       }
       return this.sslProtocol();
     }
-
 }

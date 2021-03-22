@@ -6,7 +6,9 @@ import {MiddleWare} from "./MiddleWare";
 export interface ExpressSpringApplicationImpl{
     getApp( ):express.Application
     getMiddleWare( ):MiddleWare
+    loadProperties( path:string ):ExpressSpringApplicationImpl
     config( ): ExpressSpringApplicationImpl
+    initPages():ExpressSpringApplicationImpl
     sslProtocol():void
     listen( ):void
 }
@@ -14,7 +16,6 @@ export interface ExpressSpringApplicationImpl{
  *
 */
 export interface SpringApplication{
-    setLogger(l:any): SpringApplication
     getApp( ):express.Application
     init( pages_directory:string ): SpringApplication
 }
@@ -25,3 +26,7 @@ export interface UserAuthorization{
     type:number
 }
 export type userAuthorization = { [key:string]:any } & UserAuthorization
+
+export interface SprintRunner{
+    run():void
+}
