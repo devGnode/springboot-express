@@ -23,8 +23,14 @@ Express framework as environment.
 - `@Spring.DeleteMapping( endpoint: string [, authLevel  ]  )`
 - `@Spring.HeadMapping( endpoint: string [, authLevel  ]  )`
 
+### Steps
 
-### Configuration file
+- Configuration Properties
+- Master controller  
+- Server Environment configuration
+- Open Server
+
+# Configuration Properties
 
 - config.json
 
@@ -38,6 +44,16 @@ Express framework as environment.
   "pagesDirectory": "src/dao/controller/pages"
 }
 ````
+or properties file :
+
+````properties
+gateway         = 0.0.0.0
+httpProtocol    = true
+httpsProtocol   = false
+port            = 80
+sslPort         = 443
+pagesDirectory  = src/dao/controller/pages
+````
 
 Only for these properties, if they are not declared here is their value by default :
 
@@ -47,8 +63,22 @@ Only for these properties, if they are not declared here is their value by defau
 
 These parameters are mandatory and essential :
 
-- **pagesDirectory**
+- **pagesDirectory** : Absolute path directory
 - httpProtocol : `boolean`
+
+Run with basic configuration ( without configuration) :
+
+-   Go to : Master controller Steps
+
+Run with from your owns properties file configuration :
+
+- Form Master controller call : `loadProperties( path:string )`
+
+````typescript
+this.loadProperties(process.cwd()+"/src/config/config.json");
+````
+
+Run with from owns properties class 
 
 ### Organize Properties Configuration
 
@@ -103,7 +133,7 @@ try {
 export const properties;
 ````
 
-### Master controller
+# Master Controller
 
 > public abstract class ExpressSpringApp extends ExpressSpringApplicationImpl
 
@@ -118,7 +148,9 @@ Methods :
 - `getBaseUrl( ):string` :
 - `getApp( ):express.Application` : Express application handler
 - `getMiddleWare(): MiddleWare` : Express middleware
+- `loadProperties( path:string ):ExpressSpringApplicationImpl` : Express middleware
 - `config(): ExpressSpringApplicationImpl` : Throwable not implemented should be implemented in your MasterController
+- `initPages():ExpressSpringApplicationImpl`
 - `sslProtocol( ):void`
 - `listen( ):void`
 
@@ -133,8 +165,10 @@ export class MasterController extends ExpressSpringApp{
     private static readonly INSTANCE:MasterController = new MasterController();
 
     constructor() {
-        // give your PropertiesConfig class to springboot-express
+        // Run with your owns properties class
         super(PropertiesConfig.getInstance());
+        // Run from your owns properties file
+        // this.loadProperties( ".." );
     }
 
     public config():MasterController{
@@ -179,10 +213,10 @@ export class Authentication {
 
 `````
 
-Run :
+# Open Server
 
 ````typescript
-MasterController.getInstance().config().listen();
+MasterController.getInstance().config().initPages().listen();
 ````
 
 ### Authorization
