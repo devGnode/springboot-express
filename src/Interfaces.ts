@@ -1,7 +1,5 @@
 import * as express from "express";
 import {MiddleWare} from "./MiddleWare";
-import {List} from "lib-utils-ts/src/Interface";
-import {Cookie} from "lib-utils-ts/src/net/Cookie";
 /**
  *
 */
@@ -20,3 +18,10 @@ export interface SpringApplication{
     getApp( ):express.Application
     init( pages_directory:string ): SpringApplication
 }
+/***
+ * User storage user information
+ */
+export interface UserAuthorization{
+    type:number
+}
+type userAuthorization = { [key:string]:string } & UserAuthorization
