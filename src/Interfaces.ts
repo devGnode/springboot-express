@@ -24,4 +24,4 @@ export interface SpringApplication{
 export interface UserAuthorization{
     type:number
 }
-type userAuthorization = { [key:string]:string } & UserAuthorization
+export type userAuthorization = { [key:string]:any } & UserAuthorization
