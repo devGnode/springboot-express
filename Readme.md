@@ -281,24 +281,6 @@ If you want run the server when you have use `@Spring.Configuration` annotation 
 new MasterController().config().initPages().listen();
 ````
 
-### Authorization use JWT token
-
-Endpoint user authorization :
-
-|  NAME | VALUE |
-|:---|:---:|
-| ALL | 0x00 |
-| ADMIN | 0x01 |
-| OPERATOR | 0x02 |
-| SELLER | 0x04 |
-| CUSTOMER | 0x08 |
-
-- `GetMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
-- `PostMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
-- `PutMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL) `
-- `DeleteMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
-- `HeadMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
-
 ### MiddleWare
 
 - `jsonBodyParser( ):MidddleWare` : body-parser middleware
@@ -353,7 +335,23 @@ Get cookie from callback :
     
 ````
 
-## jwtAuthorization
+# Authorization use JWT token
+
+Endpoint user authorization :
+
+|  NAME | VALUE |
+|:---|:---:|
+| ALL | 0x00 |
+| ADMIN | 0x01 |
+| OPERATOR | 0x02 |
+| SELLER | 0x04 |
+| CUSTOMER | 0x08 |
+
+- `GetMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
+- `PostMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
+- `PutMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL) `
+- `DeleteMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
+- `HeadMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
 
 For Enabled this feature, in your launcher of middlewares :
 
