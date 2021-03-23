@@ -6,6 +6,7 @@ import * as jwt from "jsonwebtoken";
 import {NextFunction,Response,Request} from "express";
 import {SpringbootReq} from "./SpringbootReq";
 import {Define} from "lib-utils-ts/src/Define";
+import {NullPointerException} from "lib-utils-ts/src/Exception";
 /***
  *
  */
@@ -34,7 +35,7 @@ export class MiddleWare{
         return this;
     }
     /***
-     * -1 or 0xffffffff : Block for all ( need JWT-Token auth for all endPoint )
+     * -1 : Block for all without AUTH_LEVEL.ALL
      * 0 : access all ( all without ALL user can access )
      * @param level
      */
@@ -78,7 +79,8 @@ export class MiddleWare{
         return this;
     }
     /****
-     *
+     * @jwtAuthorization
+     * @Throwable NullPointerException
      */
     public jwtAuthorization(
         secret:string|Buffer,
@@ -88,6 +90,7 @@ export class MiddleWare{
         this.app.getApp().use((req:Request,res:Response,next: NextFunction)=>{
             let token:String, spring:SpringbootReq = req["springboot"];
 
+            Object.requireNotNull(spring,"something wrong 'SpringbootReq' class is null !");
             if( Define.of(cookieUser).isNull() && req.headers.authorization ) token = req.headers.authorization;
             else if( !Define.of(cookieUser).isNull() ){
                 token = spring.getCookie()
@@ -100,8 +103,10 @@ export class MiddleWare{
             if(token){
                 jwt.verify( token, secret, {algorithm:algorithm}, (error,payload:any)=>{
                     if(error) {return;}
-                    spring.setType(payload.access[0].role);
-                    spring.setJwtToken(payload);
+                    try {
+                        spring.setType(payload.access[0].role);
+                        spring.setJwtToken(payload);
+                    }catch (e){throw new NullPointerException(e.stackTrace)}
                 });
             }
             next();
