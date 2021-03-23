@@ -6,7 +6,7 @@ import {SpringbootReqImpl} from "./Interfaces";
 
 export class SpringbootReq implements SpringbootReqImpl{
 
-    @flombok.ENUMERABLE(false, 0xffffffff )
+    @flombok.ENUMERABLE(false, -1 )
     @flombok.GETTER()
     @flombok.SETTER()
     private type:number;
