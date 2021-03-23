@@ -353,7 +353,7 @@ Endpoint user authorization :
 - `DeleteMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
 - `HeadMapping( route: string, level: Spring.AUTH_LEVEL = Spring.AUTH_LEVEL.ALL )`
 
-For Enabled this feature, in your launcher of middlewares :
+### 2 Methods ( Cookie, Header )
 
 - Header bearer Authorization token ***Default*** ( Cookie argument is null by default ! )
 - Cookie Authorization token
@@ -362,11 +362,11 @@ Prototype of `jwtAuthorization` :
 
 - Secret : can be a buffer of a private key ( pem file ) or a simple string of characters
 - algorithm : HS256, RS256
-- cookie : Cookie object `new Cookie("NAME_OF_COOKIE")` is you want use cookie Auth mode.
+- cookie : Cookie object. `new Cookie("NAME_OF_COOKIE")` if you want use by cookie Auth mode.
 
 Config Steps :
 
-if you use by cookie way, and use cookieParser. Make sur you have call `cookieParser` middleware before `jwtAuthorization` 
+if you use the feature by cookie way and cookieParser too. Make sur you have call `cookieParser` middleware before `jwtAuthorization` 
 middleware.
 
 Cookie `HS256` :
