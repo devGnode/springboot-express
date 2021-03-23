@@ -10,6 +10,7 @@ import {MiddleWare} from "./MiddleWare";
 import "lib-utils-ts/src/globalUtils";
 import {AbstractProperties, Properties, PropertiesJson} from "lib-utils-ts/src/file/Properties";
 import {RuntimeException} from "lib-utils-ts/src/Exception";
+import {Spring} from "./Spring";
 /***
  * Proxy Class
 */
@@ -109,6 +110,7 @@ export abstract class ExpressSpringApp implements ExpressSpringApplicationImpl{
 
     protected baseUrl:string = "/v1";
     protected middleWare: MiddleWare;
+    protected mockUserAccess:Spring.AUTH_LEVEL = -1;
 
     protected constructor( properties: IPropertiesFile<string, Object> = null ) {
 
@@ -135,6 +137,15 @@ export abstract class ExpressSpringApp implements ExpressSpringApplicationImpl{
     }
 
     public getBaseUrl( ):string{return String(this.prop.getProperty("gateway", this.baseUrl));}
+
+    public setMockDefaultUserAccess( level:Spring.AUTH_LEVEL ):ExpressSpringApplicationImpl {
+        this.mockUserAccess = level;
+        return this;
+    }
+
+    public getMockDefaultUserAccess( ):Spring.AUTH_LEVEL {
+        return this.mockUserAccess;
+    }
 
     public getApp( ):express.Application{return this.applicationWrap.getApp();}
 

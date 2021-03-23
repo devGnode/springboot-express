@@ -27,7 +27,7 @@ export class SpringbootReq implements SpringbootReqImpl{
     public getCookie:flombok.accessorGetFunc<List<Cookie>>
     public setCookie:flombok.accessorSetFunc<List<Cookie>>
 
-    public getJwtToken:flombok.accessorGetFunc<MapType<string, string>>;
-    public setJwtToken:flombok.accessorSetFunc<MapType<string, string>>;
+    public getJwtToken:flombok.accessorGetFunc<MapType<string, Object>>;
+    public setJwtToken:flombok.accessorSetFunc<MapType<string, Object>>;
 
 }

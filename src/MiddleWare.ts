@@ -34,16 +34,9 @@ export class MiddleWare{
         });
         return this;
     }
-    /***
-     * -1 : Block for all without AUTH_LEVEL.ALL
-     * 0 : access all ( all without ALL user can access )
-     * @param level
+    /****
+     *
      */
-    public setMockDefaultUserAccess( level:number ):this{
-        let user:SpringbootReq = new SpringbootReq();
-        user.setType(level);
-        return this;
-    }
     public jsonBodyParser( ):this{
         /***
          * Middleware
@@ -108,6 +101,10 @@ export class MiddleWare{
                         spring.setJwtToken(payload);
                     }catch (e){throw new NullPointerException(e.stackTrace)}
                 });
+            // mock
+            }else if(this.app.getMockDefaultUserAccess()){
+                spring.setType(this.app.getMockDefaultUserAccess());
+                spring.setJwtToken({ "access":[{"role":1}] });
             }
             next();
         });
