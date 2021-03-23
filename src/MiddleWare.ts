@@ -28,7 +28,7 @@ export class MiddleWare{
     private autoCall():this{
         this.app.getApp().use((req:Request,res:Response,next: NextFunction)=>{
             let user:SpringbootReq = new SpringbootReq();
-            user.setType(-1);
+            user.setType(this.app.getMockDefaultUserAccess());
             req["springboot"]=user;
             next();
         });
@@ -101,7 +101,11 @@ export class MiddleWare{
                         spring.setJwtToken(payload);
                     }catch (e){throw new NullPointerException(e.stackTrace)}
                 });
-            // mock
+                /****
+                 * WARNING:
+                 * for disabled this feature set this property to null
+                 * or define this property with privilege wished.
+                 */
             }else if(this.app.getMockDefaultUserAccess()){
                 spring.setType(this.app.getMockDefaultUserAccess());
                 spring.setJwtToken({ "access":[{"role":1}] });
