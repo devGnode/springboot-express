@@ -69,11 +69,13 @@ These parameters are mandatory and essential :
 - **pagesDirectory** : Absolute path directory
 - httpProtocol : `boolean`
 
-Run with basic configuration ( without configuration) :
+logger properties configuration : &rarr; [here](https://github.com/devGnode/logger20js#readme)
 
--   Go to : Master controller Steps
+###  with basic configuration ( without configuration) :
 
-Run with from your owns properties file configuration :
+-   Go to : [Master controller Steps](https://github.com/devGnode/springboot-express#master-controller)
+
+### Run with from your owns properties file configuration :
 
 - Form Master controller call : `loadProperties( path:string )`
 
@@ -81,7 +83,7 @@ Run with from your owns properties file configuration :
 this.loadProperties(process.cwd()+"/src/config/config.json");
 ````
 
-Run with annotation :
+### Run with annotation :
 
 Put this annotation at the top of your master class controller. This annotation don't support singleton pattern !!
 
@@ -102,9 +104,9 @@ export class MasterController extends ExpressSpringApp{
 }
 ````
 
-Run with from owns properties class 
+### Run with from owns properties class 
 
-### Organize Properties Configuration
+#### Organize Properties Configuration
 
 Best patrice :
 
@@ -279,7 +281,7 @@ If you want run the server when you have use `@Spring.Configuration` annotation 
 new MasterController().config().initPages().listen();
 ````
 
-### Authorization
+### Authorization use JWT token
 
 Endpoint user authorization :
 
