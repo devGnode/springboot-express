@@ -1,22 +1,48 @@
 import * as bodyParser from "body-parser";
 import {ExpressSpringApp} from "./Application";
 import {Cookie} from "lib-utils-ts/src/net/Cookie";
-import {ArrayList} from "lib-utils-ts/src/List";
-import {List} from "lib-utils-ts/src/Interface";
 import {Logger} from "logger20js-ts";
 import * as jwt from "jsonwebtoken";
-
-export enum AUTH_JWT{
-    JWT_AUTH_COOKIE = 0x00,
-    JWT_AUTH_HEADER = 0x02
+import {NextFunction,Response,Request} from "express";
+import {SpringbootReq} from "./SpringbootReq";
+import {Define} from "lib-utils-ts/src/Define";
+/***
+ *
+ */
+export enum ALGORITHM_JWT_ACCEPTED{
+    HS256 = "HS256",
+    RS256 = "RS256"
 }
-
+/***
+ *
+ */
 export class MiddleWare{
 
     private app:ExpressSpringApp;
 
-    constructor(app:ExpressSpringApp) {this.app = app;}
-
+    constructor(app:ExpressSpringApp) {this.app = app; this.autoCall(); }
+    /****
+     *
+     */
+    private autoCall():this{
+        this.app.getApp().use((req:Request,res:Response,next: NextFunction)=>{
+            let user:SpringbootReq = new SpringbootReq();
+            user.setType(-1);
+            req["springboot"]=user;
+            next();
+        });
+        return this;
+    }
+    /***
+     * -1 or 0xffffffff : Block for all ( need JWT-Token auth for all endPoint )
+     * 0 : access all ( all without ALL user can access )
+     * @param level
+     */
+    public setMockDefaultUserAccess( level:number ):this{
+        let user:SpringbootReq = new SpringbootReq();
+        user.setType(level);
+        return this;
+    }
     public jsonBodyParser( ):this{
         /***
          * Middleware
@@ -25,6 +51,7 @@ export class MiddleWare{
          this.app.getApp().use(bodyParser.json());
         return this;
     }
+
     public routeLogger( pattern:string = null ):this{
         /***
          */
@@ -35,15 +62,16 @@ export class MiddleWare{
      *
      */
     public cookieParser():this{
-       this.app.getApp().use((req,res,next)=>{
+        this.app.getApp().use((req:Request,res:Response,next: NextFunction)=>{
+            let user:SpringbootReq = req["springboot"];
             if( req.headers.cookie.length > 0 ){
-                req["spring_boot"] = req.headers
+                user.setCookie(req.headers
                     .cookie
                     .explodeAsList(";")
                     .stream()
                     .mapTo<Cookie>(value=>Cookie.parse(value))
-                    .getList()
-                    .toArray();
+                    .getList())
+                   // .toArray();
             }
             next();
         });
@@ -52,23 +80,28 @@ export class MiddleWare{
     /****
      *
      */
-    public jwtAuthorization( secret:string, mode:AUTH_JWT = AUTH_JWT.JWT_AUTH_HEADER,  cookieUser:Cookie = null ):this{
-        this.app.getApp().use((req,res,next)=>{
-            let token:String;
-            if( mode === 0x00 && req.headers.authorization ) token = req.headers.authorization;
-            else if( mode === 0x02 ){
-                let cookie: List<Cookie> = new ArrayList(req["spring_boot"]);
-                token = cookie
+    public jwtAuthorization(
+        secret:string|Buffer,
+        algorithm:ALGORITHM_JWT_ACCEPTED =ALGORITHM_JWT_ACCEPTED.HS256,
+        cookieUser:Cookie = null
+    ):this{
+        this.app.getApp().use((req:Request,res:Response,next: NextFunction)=>{
+            let token:String, spring:SpringbootReq = req["springboot"];
+
+            if( Define.of(cookieUser).isNull() && req.headers.authorization ) token = req.headers.authorization;
+            else if( !Define.of(cookieUser).isNull() ){
+                token = spring.getCookie()
                     .stream()
-                    .filter(cookie=>cookie.getName().equals(String(cookieUser.getName())))
+                    .filter(cookie=>cookie.getName().trim().equals(<string>cookieUser.getName()))
                     .findFirst()
                     .orElse(new Cookie("empty","empty"))
                     .getValue();
             }
             if(token){
-                jwt.verify( token, secret,(error,payload:string)=>{
-                    if(error) return;
-                    req["springboot_jwt_auth"] = payload;
+                jwt.verify( token, secret, {algorithm:algorithm}, (error,payload:any)=>{
+                    if(error) {return;}
+                    spring.setType(payload.access[0].role);
+                    spring.setJwtToken(payload);
                 });
             }
             next();

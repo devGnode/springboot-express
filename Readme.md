@@ -301,8 +301,12 @@ Endpoint user authorization :
 
 ### MiddleWare
 
-- `jsonBodyParser( ):this` : body-parser middleware
-- `cookieParser` : is not rpm cookie-parser. Home made cookie parser
+- `jsonBodyParser( ):MidddleWare` : body-parser middleware
+- `cookieParser():MidddleWare` : is not rpm cookie-parser. Home made cookie parser
+- `routeLogger( pattern:string = null ):MiddleWare`   : see &rarr; [logger20js-ts express middleware](https://github.com/devGnode/logger20js#express-middleware-logger--120)
+- `setMockDefaultUserAccess( level: Spring;AUTH_LEVEL ):MidddleWare`
+- `jwtAuthorization( secret:string|Buffer, algorithm:ALGORITHM_JWT_ACCEPTED =ALGORITHM_JWT_ACCEPTED.HS256, cookieUser:Cookie = null):MidddleWare`
+
 
 Define your middleware in your config method from your master class controller
 
@@ -321,9 +325,9 @@ Enabled from your middleware config : `cookieParser()`
 
 Get cookie from callback :
 
-- property : spring_boot
+- property object: springboot
 
-> get cookie by this way : req["spring_boot"]
+> get cookie by this way : req["springboot"]
 
 ````typescript
     import {List} from "lib-utils-ts/src/Interface";
@@ -332,14 +336,15 @@ Get cookie from callback :
     /*...*/
     @Spring.GetMapping("/v1/getCookie")
     public static firstFactorConnection(req: Request, res: Response):void{
-        let cookie: List<Cookie> = new ArrayList(req["spring_boot"]);
+        let spring:SpringbootReq = req["springboot"];
+        let cookie: List<Cookie> = spring.getCookie();
 
         cookie.stream().each((value:Cookie)=>{
-            console.log( value.getName() )
+            console.log( value.getName().trim() )
         });
         // getCookie
         cookie.stream()
-            .filter(cookie=>cookie.getName().equals("myCookie"))
+            .filter(cookie=>cookie.getName().trim().equals("myCookie"))
             .findFirst()
             .orElse(null);
         
@@ -347,6 +352,69 @@ Get cookie from callback :
     }
     
 ````
+
+## jwtAuthorization
+
+For Enabled this feature, in your launcher of middlewares :
+
+- Header bearer Authorization token ***Default*** ( Cookie argument is null by default ! )
+- Cookie Authorization token
+
+Prototype of `jwtAuthorization` :
+
+- Secret : can be a buffer of a private key ( pem file ) or a simple string of characters
+- algorithm : HS256, RS256
+- cookie : Cookie object `new Cookie("NAME_OF_COOKIE")` is you want use cookie Auth mode.
+
+Config Steps :
+
+if you use by cookie way, and use cookieParser. Make sur you have call `cookieParser` middleware before `jwtAuthorization` 
+middleware.
+
+Cookie `HS256` :
+
+````typescript
+public config( ):ExpressSpringApplicationImpl{
+    this.getMiddleWare()
+        .cookieParser()
+        .jwtAuthorization( "secret", ALGORITHM_JWT_ACCEPTED.HS256, new Cookie("jwtToken") );;
+    /*....*/
+}
+````
+Cookie `RS256` :
+
+````typescript
+public config( ):ExpressSpringApplicationImpl{
+    this.getMiddleWare()
+        .cookieParser()
+        .jwtAuthorization( fs.readFileSync("key.pem"), ALGORITHM_JWT_ACCEPTED.RS256, new Cookie("jwtToken") );;
+    /*....*/
+}
+````
+
+### Encode 
+
+For have an access to your protect endpoint, make you payload as below :
+
+````json
+{
+  "sub": "username",
+  "exp": 1616966915326,
+  "access": [ { "role": 1 } ],
+}
+````
+
+- `sub` &rarr; username
+- `exp` &rarr; expiration timestamp
+- `access` &rarr; Object.role : Spring.AUTH_LEVEL
+
+> eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqbGhhd24iLCJleHAiOjE2MTY5NjY5MTUzMjYsImFjY2VzcyI6W3sicm9sZSI6MX1dfQ.LPtnpxS6h9Mz52c3XNhEcqJ8YkONuThAJJEW1BqUDSM
+
+
+### devTools Mock user without token
+
+- `setMockDefaultUserAccess( level: Spring;AUTH_LEVEL ):MidddleWare`
+
 
 ## :octocat: From git
 

@@ -1,8 +1,8 @@
 import {Request, Response} from "express";
 import {Application} from "./Application";
 import {Define} from "lib-utils-ts/src/Define";
-import {userAuthorization} from "./Interfaces";
 import {Logger} from "logger20js-ts";
+import {SpringbootReq} from "./SpringbootReq";
 
 export module Spring{
     /****
@@ -37,9 +37,10 @@ export module Spring{
      */
     export function userControlHandler(handler: Function, level:Spring.AUTH_LEVEL, target: Object = null ){
         return (req: Request, res: Response)=> {
-            let user: Define<userAuthorization> = Define.of(req["springboot_jwt_auth"]);
+            let spring:SpringbootReq = req["springboot"],
+                user: Define<number> = Define.of(spring.getType());
 
-            if (( !user.isNull() || !level.equals(user.orElse({type:0xffffffff}).type)) && !level.equals(Spring.AUTH_LEVEL.ALL) ){
+            if ( user.isNull() || ( user.orElse(-1) >  level  && !level.equals(Spring.AUTH_LEVEL.ALL)) ){
                 res.status(401).json({ status: "Unauthorized" });
             }else{
                 Object.requireNotNull<Object>(handler,"Some bad - Endpoint Handler is null !")

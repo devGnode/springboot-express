@@ -26,7 +26,3 @@ export interface UserAuthorization{
     type:number
 }
 export type userAuthorization = { [key:string]:any } & UserAuthorization
-
-export interface SprintRunner{
-    run():void
-}
