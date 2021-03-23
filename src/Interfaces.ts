@@ -3,6 +3,7 @@ import {MiddleWare} from "./MiddleWare";
 import {flombok} from "lib-utils-ts/src/flombok";
 import {List, MapType} from "lib-utils-ts/src/Interface";
 import {Cookie} from "lib-utils-ts/src/net/Cookie";
+import {Spring} from "./Spring";
 /**
  *
 */
@@ -10,6 +11,7 @@ export interface ExpressSpringApplicationImpl{
     getApp( ):express.Application
     getMiddleWare( ):MiddleWare
     loadProperties( path:string ):ExpressSpringApplicationImpl
+    setMockDefaultUserAccess( level:Spring.AUTH_LEVEL ):ExpressSpringApplicationImpl
     config( ): ExpressSpringApplicationImpl
     initPages():ExpressSpringApplicationImpl
     sslProtocol():void
@@ -29,6 +31,6 @@ export interface SpringbootReqImpl{
     setType:flombok.setNumberFunc;
     getCookie:flombok. accessorGetFunc<List<Cookie>>;
     setCookie:flombok. accessorSetFunc<List<Cookie>>;
-    getJwtToken:flombok.accessorGetFunc<MapType<string, string>>;
-    setJwtToken:flombok.accessorSetFunc<MapType<string, string>>;
+    getJwtToken:flombok.accessorGetFunc<MapType<string, Object>>;
+    setJwtToken:flombok.accessorSetFunc<MapType<string, Object>>;
 }
