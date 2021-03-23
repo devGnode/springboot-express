@@ -97,7 +97,7 @@ export class MiddleWare{
                 jwt.verify( token, secret, {algorithm:algorithm}, (error,payload:any)=>{
                     if(error) {return;}
                     try {
-                        spring.setJwtToken(payload.access[0].role);
+                        spring.setType(payload.access[0].role);
                         spring.setJwtToken(payload);
                     }catch (e){throw new NullPointerException(e.stackTrace)}
                 });
