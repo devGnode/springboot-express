@@ -5,8 +5,7 @@
   "main": "lib/Application.js",
   "types": "lib/Application.js.d.ts",
   "scripts": {
-    "compile:prod": "tsc --outDir ./lib",
-    "test": "ts-node test.ts"
+    "compile:prod": "tsc --outDir ./lib"
   },
   "engines": {
     "node": ">= 12.14.1"
