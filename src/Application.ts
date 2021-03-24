@@ -13,6 +13,8 @@ import {RuntimeException} from "lib-utils-ts/src/Exception";
 import {Spring} from "./Spring";
 import * as fs from "fs";
 import {Define} from "lib-utils-ts/src/Define";
+import {Class} from "lib-utils-ts/src/Class";
+import {Constructor} from "lib-utils-ts/src/Constructor";
 /***
  * Proxy Class
 */
@@ -29,6 +31,7 @@ export class Application implements SpringApplication{
     private configFile:string;
 
     private handler:List<Object> = new ArrayList();
+    private preValidation:List<string> = new ArrayList();
 
     constructor() {
         Logger.setPattern("[%hours{yellow}] %T{w?yellow;e?red;d?green}/%name - %error");
@@ -55,6 +58,8 @@ export class Application implements SpringApplication{
             .orElse(null);
     }
 
+    public setPreValidation(constructorName:string):void{this.preValidation.add(constructorName);}
+
     public setConfigFileName( path:string ):void{ this.configFile = path; }
 
     public getConfigFileName(  ):string{ return this.configFile; }
@@ -74,7 +79,7 @@ export class Application implements SpringApplication{
         }
     }
     /***
-     *
+     * @criticalFeature defect risk : 5/5
      * @param path
      * @param exclude
      * @param deepLimit : explores 50 deeps by subdirectory
@@ -99,7 +104,10 @@ export class Application implements SpringApplication{
         }
         throw new RuntimeException(`${path} is not a directory !`);
     }
-
+    /****
+     * @criticalFeature defect risk : 5/5
+     * @param pages_directory
+     */
     public init( pages_directory:string ): SpringApplication{
         let p0: Predication<string> = new Predication<string>();
         let p1: Predication<string> = new Predication<string>();
@@ -113,11 +121,29 @@ export class Application implements SpringApplication{
             .stream()
             .filter(p0.and(p1.negate()))
             .each(value=>{
-                value = value.explodeAsList(/\.\w+$/).get(0);
-                try{import(`${value}`);}catch (e){
+                let constructor: Constructor<Object>,
+                    instance:Object;
+                try{
+                    /***
+                     * @waitOf ib-util-t-1.3.3-beta fixed
+                     */
+                    // console.log("package name ",`${value}`.replace(process.cwd(),"").replace(/\\|\//gi,"."))
+                    value = value.explodeAsList(/\.\w+$/).get(0);
+                    /***
+                     * @ClassNotFoundException
+                     * @warning use lib-util-ts >= 1.3.3-beta
+                     */
+                    constructor = Class.forName(`${value}`.replace(/\\|\//gi,"."));
+                    instance = constructor.newInstance();
+                    if( !this.preValidation.stream().filter(o=>o.equals(constructor.getName())).findFirst().isEmpty() ){
+                        this.preValidation.remove(constructor.getName());
+                        this.addHandler(instance);
+                    }
+                    //import(`${value}`);
+                }catch (e){
                     throw new RuntimeException(e);
                 }
-                this.logger.debug(`import : %s page`,String(`${value}`).colorize().green);
+                this.logger.debug(`import : %s page loaded`,String(`${value}`.replace(process.cwd(),"").replace(/\\|\//gi,".").replace(/^./,"@")).colorize().green);
             });
 
         this.loaded=true;
