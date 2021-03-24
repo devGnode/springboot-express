@@ -3,7 +3,7 @@ import {readdirSync} from "fs";
 import {ArrayList} from "lib-utils-ts/src/List";
 import {Predication} from "lib-utils-ts/src/Predication";
 import * as https from "https";
-import {IPropertiesFile, IPropertiesFileA, List} from "lib-utils-ts/src/Interface";
+import {IPropertiesFile, List, MapType} from "lib-utils-ts/src/Interface";
 import {ExpressSpringApplicationImpl, SpringApplication} from "./Interfaces";
 import { Logger} from "logger20js-ts";
 import {MiddleWare} from "./MiddleWare";
@@ -11,6 +11,8 @@ import "lib-utils-ts/src/globalUtils";
 import {AbstractProperties, Properties, PropertiesJson} from "lib-utils-ts/src/file/Properties";
 import {RuntimeException} from "lib-utils-ts/src/Exception";
 import {Spring} from "./Spring";
+import * as fs from "fs";
+import {Define} from "lib-utils-ts/src/Define";
 /***
  * Proxy Class
 */
@@ -71,6 +73,32 @@ export class Application implements SpringApplication{
             }
         }
     }
+    /***
+     *
+     * @param path
+     * @param exclude
+     * @param deepLimit : explores 50 deeps by subdirectory
+     * @param deep
+     * @private
+     */
+    private tree( path:string, exclude: RegExp = null,deepLimit:number = 50, deep:number = 0 ):string[]{
+        let out:string[] = [];
+        if(fs.lstatSync(path).isDirectory()){
+            ArrayList.of<string>(readdirSync(path))
+                .stream()
+                .each(subPath=>{
+                    let isDir:boolean;
+                    if((isDir=fs.statSync(`${path}/${subPath}`).isDirectory())&&(deep<deepLimit||deepLimit===-1)){
+                        out = out.concat(this.tree(`${path}/${subPath}`,exclude,deepLimit,0));
+                        deep++;
+                    }else if(!isDir){
+                        if(Define.of(exclude).isNull()||!exclude.test(subPath))out.push(`${path}/${subPath}`);
+                    }
+            });
+            return out;
+        }
+        throw new RuntimeException(`${path} is not a directory !`);
+    }
 
     public init( pages_directory:string ): SpringApplication{
         let p0: Predication<string> = new Predication<string>();
@@ -80,16 +108,16 @@ export class Application implements SpringApplication{
         p1.test = (value)=>value.endsWith(".d.ts");
         p0.test = (value)=>value.endsWith(".ts");
 
-        if(pages_directory.equals("undefined"))new RuntimeException("No configuration found !")
-        ArrayList.of(readdirSync(pages_directory))
+        if(pages_directory.equals("undefined"))new RuntimeException("No configuration found !");
+        ArrayList.of(this.tree(pages_directory,/(.js|.map|.d.ts)$/))
             .stream()
             .filter(p0.and(p1.negate()))
             .map(value=> value.explodeAsList(".").get(0) )
             .each(value=>{
-                try{import(`${pages_directory}/${value}`);}catch (e){
+                try{import(`${value}`);}catch (e){
                     throw new RuntimeException(e);
                 }
-                this.logger.debug(`import : %s page`,String(`${pages_directory}/${value}`).colorize().green);
+                this.logger.debug(`import : %s page`,String(`${value}`).colorize().green);
             });
 
         this.loaded=true;
