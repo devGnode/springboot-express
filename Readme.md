@@ -174,6 +174,7 @@ Methods :
 - `getBaseUrl( ):string` :
 - `getApp( ):express.Application` : Express application handler
 - `getMiddleWare(): MiddleWare` : Express middleware
+- `setMockDefaultUserAccess( level: Spring;AUTH_LEVEL )` : Express middleware ( devTools Mock user without token )
 - `loadProperties( path:string ):ExpressSpringApplicationImpl` : Express middleware
 - `config(): ExpressSpringApplicationImpl` : Throwable not implemented should be implemented in your MasterController
 - `initPages():ExpressSpringApplicationImpl`
@@ -286,7 +287,6 @@ new MasterController().config().initPages().listen();
 - `jsonBodyParser( ):MidddleWare` : body-parser middleware
 - `cookieParser():MidddleWare` : is not rpm cookie-parser. Home made cookie parser
 - `routeLogger( pattern:string = null ):MiddleWare`   : see &rarr; [logger20js-ts express middleware](https://github.com/devGnode/logger20js#express-middleware-logger--120)
-- `setMockDefaultUserAccess( level: Spring;AUTH_LEVEL ):MidddleWare`
 - `jwtAuthorization( secret:string|Buffer, algorithm:ALGORITHM_JWT_ACCEPTED =ALGORITHM_JWT_ACCEPTED.HS256, cookieUser:Cookie = null):MidddleWare`
 
 
@@ -407,11 +407,6 @@ For have an access to your protect endpoint, make you payload as below :
 - `access` &rarr; Object.role : Spring.AUTH_LEVEL
 
 > eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqbGhhd24iLCJleHAiOjE2MTY5NjY5MTUzMjYsImFjY2VzcyI6W3sicm9sZSI6MX1dfQ.LPtnpxS6h9Mz52c3XNhEcqJ8YkONuThAJJEW1BqUDSM
-
-
-### devTools Mock user without token
-
-- `setMockDefaultUserAccess( level: Spring;AUTH_LEVEL ):MidddleWare`
 
 
 ## :octocat: From git
