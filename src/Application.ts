@@ -112,8 +112,8 @@ export class Application implements SpringApplication{
         ArrayList.of(this.tree(pages_directory,/(.js|.map|.d.ts)$/))
             .stream()
             .filter(p0.and(p1.negate()))
-            .map(value=> value.explodeAsList(".").get(0) )
             .each(value=>{
+                value = value.explodeAsList(/\.\w+$/).get(0);
                 try{import(`${value}`);}catch (e){
                     throw new RuntimeException(e);
                 }
