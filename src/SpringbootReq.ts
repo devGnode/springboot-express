@@ -3,9 +3,13 @@ import {List, MapType} from "lib-utils-ts/src/Interface";
 import {ArrayList} from "lib-utils-ts/src/List";
 import {Cookie} from "lib-utils-ts/src/net/Cookie";
 import {SpringbootReqImpl} from "./Interfaces";
-
+/***
+ */
 export class SpringbootReq implements SpringbootReqImpl{
-
+    /***
+     * Default user type
+     * @private
+     */
     @flombok.ENUMERABLE(false, -1 )
     @flombok.GETTER()
     @flombok.SETTER()
