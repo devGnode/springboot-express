@@ -70,10 +70,6 @@ These parameters are mandatory and essential :
 
 logger properties configuration : &rarr; [here](https://github.com/devGnode/logger20js#readme)
 
-###  with basic configuration ( without configuration) :
-
--   Go to : [Master controller Steps](https://github.com/devGnode/springboot-express#master-controller)
-
 ### Run with from your owns properties file configuration :
 
 - Form Master controller call : `loadProperties( path:string )`
@@ -243,6 +239,8 @@ export class Authentication {
 
 Instantiated object
 
+> @Spring.Instance
+
 `````typescript
 
 @Spring.Instance
@@ -281,12 +279,12 @@ If you want run the server when you have use `@Spring.Configuration` annotation 
 new MasterController().config().initPages().listen();
 ````
 
-### MiddleWare
+# MiddleWares
 
-- `jsonBodyParser( ):MidddleWare` : body-parser middleware
-- `cookieParser():MidddleWare` : is not rpm cookie-parser. Home made cookie parser
-- `routeLogger( pattern:string = null ):MiddleWare`   : see &rarr; [logger20js-ts express middleware](https://github.com/devGnode/logger20js#express-middleware-logger--120)
-- `jwtAuthorization( secret:string|Buffer, algorithm:ALGORITHM_JWT_ACCEPTED =ALGORITHM_JWT_ACCEPTED.HS256, cookieUser:Cookie = null):MidddleWare`
+- `jsonBodyParser( ):MidddleWare` : npm body-parser middleware
+- `cookieParser():MidddleWare` : not rpm cookie-parser, Home made cookie parser.
+- `routeLogger( pattern:string = null ):MiddleWare`   : see documentation &rarr; [logger20js-ts express middleware](https://github.com/devGnode/logger20js#express-middleware-logger--120)
+- `jwtAuthorization( secret:string|Buffer, algorithm:ALGORITHM_JWT_ACCEPTED =ALGORITHM_JWT_ACCEPTED.HS256, cookieUser:Cookie = null):MidddleWare` &rarr; [doc](https://github.com/devGnode/springboot-express/tree/improvment/importation-pages#authorization-use-jwt-token)
 
 
 Define your middleware in your config method from your master class controller
@@ -389,7 +387,7 @@ public config( ):ExpressSpringApplicationImpl{
 }
 ````
 
-### Encode 
+### Encode payload
 
 For have an access to your protect endpoint, make you payload as below :
 
@@ -400,10 +398,13 @@ For have an access to your protect endpoint, make you payload as below :
   "access": [ { "role": 1 } ],
 }
 ````
+***Properties*** :
 
 - `sub` &rarr; username
 - `exp` &rarr; expiration timestamp
 - `access` &rarr; Object.role : Spring.AUTH_LEVEL
+
+***Output*** :
 
 > eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqbGhhd24iLCJleHAiOjE2MTY5NjY5MTUzMjYsImFjY2VzcyI6W3sicm9sZSI6MX1dfQ.LPtnpxS6h9Mz52c3XNhEcqJ8YkONuThAJJEW1BqUDSM
 
