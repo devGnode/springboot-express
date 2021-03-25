@@ -15,6 +15,7 @@ import * as fs from "fs";
 import {Define} from "lib-utils-ts/src/Define";
 import {Class} from "lib-utils-ts/src/Class";
 import {Constructor} from "lib-utils-ts/src/Constructor";
+import {Path} from "lib-utils-ts/src/file/Path";
 /***
  * Proxy Class
 */
@@ -122,28 +123,31 @@ export class Application implements SpringApplication{
             .filter(p0.and(p1.negate()))
             .each(value=>{
                 let constructor: Constructor<Object>,
+                    msg:string =`@Spring.Instance : new static '%s' was been add with successful`,
                     instance:Object;
                 try{
                     /***
                      * @waitOf ib-util-t-1.3.3-beta fixed
                      */
-                    // console.log("package name ",`${value}`.replace(process.cwd(),"").replace(/\\|\//gi,"."))
                     value = value.explodeAsList(/\.\w+$/).get(0);
                     /***
                      * @ClassNotFoundException
                      * @warning use lib-util-ts >= 1.3.3-beta
                      */
-                    constructor = Class.forName(`${value}`.replace(/\\|\//gi,"."));
+                    constructor = Class.forName(new Path(`${value}`));
                     instance = constructor.newInstance();
                     if( !this.preValidation.stream().filter(o=>o.equals(constructor.getName())).findFirst().isEmpty() ){
                         this.preValidation.remove(constructor.getName());
                         this.addHandler(instance);
+                        msg=`@Spring.Instance : new instance of '%s' was been created with successful`;
                     }
+                    // OLD
                     //import(`${value}`);
                 }catch (e){
                     throw new RuntimeException(e);
                 }
-                this.logger.debug(`import : %s page loaded`,String(`${value}`.replace(process.cwd(),"").replace(/\\|\//gi,".").replace(/^./,"@")).colorize().green);
+                this.logger.debug(`import : %s page`,new Path(`${value}`.replace(process.cwd(),"")).toForNamePath().replace(/^\./,"@").colorize().green);
+                this.logger.debug(msg,constructor.getName().colorize().green);
             });
 
         this.loaded=true;
