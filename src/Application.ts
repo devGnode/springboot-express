@@ -41,8 +41,21 @@ export class Application implements SpringApplication{
         this.app = express();
     }
 
+    /****
+     * @getApp: return an instance of express application
+     */
     public getApp( ):express.Application{return this.app;}
-
+    /***
+     * @addHandler : Add a new Instance of endpoint pages class.
+     * this annotation below, allows to render efficacy the initiation
+     * of spingboot. If this annotation is found when it loads all
+     * pages, then he will keep this instance in memory. otherwise
+     * a new instance will be created more later, so double run of
+     * constructor :/
+     *
+     * @Spring.Instance
+     * @param handler
+     */
     public addHandler( handler:Object ):Object{
         if(!this.getHandler(handler.getClass().getName())) this.handler.add(handler);
         return handler;
@@ -58,15 +71,40 @@ export class Application implements SpringApplication{
             .findFirst()
             .orElse(null);
     }
-
+    /****
+     * @setPreValidation
+     *
+     * @param constructorName
+     */
     public setPreValidation(constructorName:string):void{this.preValidation.add(constructorName);}
 
+    /***
+     * @setConfigFileName :
+     *
+     *
+     * @Spring.Configuration( path:string )
+     * @param path
+     */
     public setConfigFileName( path:string ):void{ this.configFile = path; }
-
+    /****
+     * @getConfigFileName
+     *
+     */
     public getConfigFileName(  ):string{ return this.configFile; }
-
+    /****
+     * @getProperties :
+     *
+     */
     public getProperties( ):Properties{ return this.prop; }
-
+    /****
+     * @loadConfiguration :
+     *
+     * @Throwable RuntimeException
+     * @Throwable IOException
+     * @Throwable JSONException
+     * @Throwable NullPointerException
+     * @param path
+     */
     public loadConfiguration( path:string ):void{
         if (!path && this.getConfigFileName()) this.loadConfiguration(this.getConfigFileName());
         else {
@@ -81,6 +119,7 @@ export class Application implements SpringApplication{
     }
     /***
      * @criticalFeature defect risk : 5/5
+     *
      * @param path
      * @param exclude
      * @param deepLimit : explores 50 deeps by subdirectory
@@ -107,6 +146,9 @@ export class Application implements SpringApplication{
     }
     /****
      * @criticalFeature defect risk : 5/5
+     *
+     * @Throwable ClassNotFoundException
+     * @Throwable NullPointerException
      * @param pages_directory
      */
     public init( pages_directory:string ): SpringApplication{
@@ -123,7 +165,7 @@ export class Application implements SpringApplication{
             .filter(p0.and(p1.negate()))
             .each(value=>{
                 let constructor: Constructor<Object>,
-                    msg:string =`@Spring.Instance : new static '%s' was been add with successful`,
+                    msg:string =`@Spring.Instance : static '%s' class was been add with successful`,
                     instance:Object;
                 try{
                     /***
@@ -153,7 +195,9 @@ export class Application implements SpringApplication{
         this.loaded=true;
         return this;
     }
-
+    /***
+     * @getInstance
+     */
     public static getInstance():Application{ return Application.INSTANCE; }
 }
 /****
