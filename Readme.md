@@ -22,9 +22,8 @@ Express framework as environment.
 - `@Spring.PutMapping( endpoint: string [, authLevel  ]  )`
 - `@Spring.DeleteMapping( endpoint: string [, authLevel  ]  )`
 - `@Spring.HeadMapping( endpoint: string [, authLevel  ]  )`
-
-
 -  `@Spring.Configuration( path: string  )` : don't support singleton pattern
+-  `@Spring.Instance`
 
 ### Steps
 
