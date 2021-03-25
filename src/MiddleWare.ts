@@ -108,7 +108,7 @@ export class MiddleWare{
                  */
             }else if(this.app.getMockDefaultUserAccess()){
                 spring.setType(this.app.getMockDefaultUserAccess());
-                spring.setJwtToken({ "access":[{"role":1}] });
+                spring.setJwtToken({ "access":[{"role":this.app.getMockDefaultUserAccess()}] });
             }
             next();
         });
