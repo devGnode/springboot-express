@@ -13,6 +13,9 @@ import {RuntimeException} from "lib-utils-ts/src/Exception";
 import {Spring} from "./Spring";
 import * as fs from "fs";
 import {Define} from "lib-utils-ts/src/Define";
+import {Class} from "lib-utils-ts/src/Class";
+import {Constructor} from "lib-utils-ts/src/Constructor";
+import {Path} from "lib-utils-ts/src/file/Path";
 /***
  * Proxy Class
 */
@@ -29,6 +32,7 @@ export class Application implements SpringApplication{
     private configFile:string;
 
     private handler:List<Object> = new ArrayList();
+    private preValidation:List<string> = new ArrayList();
 
     constructor() {
         Logger.setPattern("[%hours{yellow}] %T{w?yellow;e?red;d?green}/%name - %error");
@@ -37,8 +41,21 @@ export class Application implements SpringApplication{
         this.app = express();
     }
 
+    /****
+     * @getApp: return an instance of express application
+     */
     public getApp( ):express.Application{return this.app;}
-
+    /***
+     * @addHandler : Add a new Instance of endpoint pages class.
+     * this annotation below, allows to render efficacy the initiation
+     * of spingboot. If this annotation is found when it loads all
+     * pages, then he will keep this instance in memory. otherwise
+     * a new instance will be created more later, so double run of
+     * constructor :/
+     *
+     * @Spring.Instance
+     * @param handler
+     */
     public addHandler( handler:Object ):Object{
         if(!this.getHandler(handler.getClass().getName())) this.handler.add(handler);
         return handler;
@@ -54,13 +71,40 @@ export class Application implements SpringApplication{
             .findFirst()
             .orElse(null);
     }
+    /****
+     * @setPreValidation
+     *
+     * @param constructorName
+     */
+    public setPreValidation(constructorName:string):void{this.preValidation.add(constructorName);}
 
+    /***
+     * @setConfigFileName :
+     *
+     *
+     * @Spring.Configuration( path:string )
+     * @param path
+     */
     public setConfigFileName( path:string ):void{ this.configFile = path; }
-
+    /****
+     * @getConfigFileName
+     *
+     */
     public getConfigFileName(  ):string{ return this.configFile; }
-
+    /****
+     * @getProperties :
+     *
+     */
     public getProperties( ):Properties{ return this.prop; }
-
+    /****
+     * @loadConfiguration :
+     *
+     * @Throwable RuntimeException
+     * @Throwable IOException
+     * @Throwable JSONException
+     * @Throwable NullPointerException
+     * @param path
+     */
     public loadConfiguration( path:string ):void{
         if (!path && this.getConfigFileName()) this.loadConfiguration(this.getConfigFileName());
         else {
@@ -74,6 +118,7 @@ export class Application implements SpringApplication{
         }
     }
     /***
+     * @criticalFeature defect risk : 5/5
      *
      * @param path
      * @param exclude
@@ -99,7 +144,13 @@ export class Application implements SpringApplication{
         }
         throw new RuntimeException(`${path} is not a directory !`);
     }
-
+    /****
+     * @criticalFeature defect risk : 5/5
+     *
+     * @Throwable ClassNotFoundException
+     * @Throwable NullPointerException
+     * @param pages_directory
+     */
     public init( pages_directory:string ): SpringApplication{
         let p0: Predication<string> = new Predication<string>();
         let p1: Predication<string> = new Predication<string>();
@@ -113,17 +164,40 @@ export class Application implements SpringApplication{
             .stream()
             .filter(p0.and(p1.negate()))
             .each(value=>{
-                value = value.explodeAsList(/\.\w+$/).get(0);
-                try{import(`${value}`);}catch (e){
+                let constructor: Constructor<Object>,
+                    msg:string =`@Spring.Instance : static '%s' class was been add with successful`,
+                    instance:Object;
+                try{
+                    /***
+                     * @waitOf ib-util-t-1.3.3-beta fixed
+                     */
+                    value = value.explodeAsList(/\.\w+$/).get(0);
+                    /***
+                     * @ClassNotFoundException
+                     * @warning use lib-util-ts >= 1.3.3-beta
+                     */
+                    constructor = Class.forName(new Path(`${value}`));
+                    instance = constructor.newInstance();
+                    if( !this.preValidation.stream().filter(o=>o.equals(constructor.getName())).findFirst().isEmpty() ){
+                        this.preValidation.remove(constructor.getName());
+                        this.addHandler(instance);
+                        msg=`@Spring.Instance : new instance of '%s' was been created with successful`;
+                    }
+                    // OLD
+                    //import(`${value}`);
+                }catch (e){
                     throw new RuntimeException(e);
                 }
-                this.logger.debug(`import : %s page`,String(`${value}`).colorize().green);
+                this.logger.debug(`import : %s page`,new Path(`${value}`.replace(process.cwd(),"")).toForNamePath().replace(/^\./,"@").colorize().green);
+                this.logger.debug(msg,constructor.getName().colorize().green);
             });
 
         this.loaded=true;
         return this;
     }
-
+    /***
+     * @getInstance
+     */
     public static getInstance():Application{ return Application.INSTANCE; }
 }
 /****
