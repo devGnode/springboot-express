@@ -1,5 +1,4 @@
 import * as bodyParser from "body-parser";
-import {ExpressSpringApp} from "./Application";
 import {Cookie} from "lib-utils-ts/src/net/Cookie";
 import {Logger} from "logger20js-ts";
 import * as jwt from "jsonwebtoken";
@@ -7,6 +6,7 @@ import {NextFunction,Response,Request} from "express";
 import {SpringbootReq} from "./SpringbootReq";
 import {Define} from "lib-utils-ts/src/Define";
 import {NullPointerException} from "lib-utils-ts/src/Exception";
+import {ExpressSpringApp} from "./ExpressSpringApp";
 /***
  *
  */
