@@ -87,6 +87,7 @@ export module Spring{
 
     export function Instance(constructor: Function) {
         // dev Checking
+        Application.getInstance().setPreValidation(constructor.class().getName());
         if(!Application.getInstance().getHandler(constructor.class().getName()))Logger.factory("Spring").warn(`@Sprint.Instance : No instantiated  '${constructor.class().getName()}' class was found ! Are there any endpoint defined ?`);
     }
 
