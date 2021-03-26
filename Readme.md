@@ -86,7 +86,7 @@ Put this annotation at the top of your master class controller. This annotation 
 
 ````typescript
 @Spring.Configuration( path: string  )
-export class MasterController extends ExpressSpringApp.ts{
+export class MasterController extends ExpressSpringApp{
 
     constructor() {
         super();
@@ -156,7 +156,7 @@ export const properties;
 
 # Master Controller
 
-> public abstract class ExpressSpringApp.ts extends ExpressSpringApplicationImpl
+> public abstract class ExpressSpringApp extends ExpressSpringApplicationImpl
 
 Protected properties :
 
@@ -182,7 +182,7 @@ If you have somme importation error with `pagesDirectory` properties declare the
 
 ````typescript
 
-export class MasterController extends ExpressSpringApp.ts{
+export class MasterController extends ExpressSpringApp{
 
     private static readonly INSTANCE:MasterController = new MasterController();
 
