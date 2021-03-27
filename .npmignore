@@ -6,6 +6,7 @@ node_modules/
 logs/
 test/
 
+src/
 #
 # CD/CI
 jenkinsfile
