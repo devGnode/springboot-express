@@ -1,7 +1,16 @@
+#
+.git/
 .idea/
+.vscode/
 node_modules/
+logs/
+test/
 
 src/
 #
-#
+# CD/CI
 jenkinsfile
+*.yml
+
+# all mounted file
+*.js.map
