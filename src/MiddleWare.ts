@@ -7,6 +7,7 @@ import {SpringbootReq} from "./SpringbootReq";
 import {Define} from "lib-utils-ts/src/Define";
 import {NullPointerException} from "lib-utils-ts/src/Exception";
 import {ExpressSpringApp} from "./ExpressSpringApp";
+import {ArrayList} from "lib-utils-ts/src/List";
 /***
  *
  */
@@ -28,7 +29,16 @@ export class MiddleWare{
     private autoCall():this{
         this.app.getApp().use((req:Request,res:Response,next: NextFunction)=>{
             let user:SpringbootReq = new SpringbootReq();
+            /***
+             * complete object
+             */
             user.setType(this.app.getMockDefaultUserAccess());
+            user.setNewToken=( ... cookies:Cookie[] )=>{
+                Object.requireNotNull(cookies,"Cookie is null !");
+                ArrayList.of<Cookie>(cookies).stream().each((cookie:Cookie)=>{
+                    res.header('set-cookie',cookie.toString());
+                });
+            };
             req["springboot"]=user;
             next();
         });
@@ -41,8 +51,8 @@ export class MiddleWare{
         /***
          * Middleware
          */
-         this.app.getApp().use(bodyParser.urlencoded({ extended: false }));
-         this.app.getApp().use(bodyParser.json());
+        this.app.getApp().use(bodyParser.urlencoded({ extended: false }));
+        this.app.getApp().use(bodyParser.json());
         return this;
     }
 
@@ -65,7 +75,7 @@ export class MiddleWare{
                     .stream()
                     .mapTo<Cookie>(value=>Cookie.parse(value))
                     .getList())
-                   // .toArray();
+                // .toArray();
             }
             next();
         });

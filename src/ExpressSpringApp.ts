@@ -24,6 +24,7 @@ export abstract class ExpressSpringApp implements ExpressSpringApplicationImpl{
         if(properties){
             this.prop = <Properties>properties;
             this.baseUrl = <string>properties.getProperty("baseUrl", null );
+            Logger.setPropertiesConfigHandle(this.prop);
         }else if(!this.prop){
             // minimal Configuration
             this.prop = new Properties();
@@ -34,6 +35,7 @@ export abstract class ExpressSpringApp implements ExpressSpringApplicationImpl{
             this.prop.setProperty("loggerParser", "[%hours{yellow}] %T{w?yellow;e?red;d?green}/%name - %error");
             this.prop.setProperty("logEnabledColorize", true);
             this.prop.setProperty("saveLog", false);
+            Logger.setPropertiesConfigHandle(this.prop);
         }
         this.middleWare = new MiddleWare(this);
     }
