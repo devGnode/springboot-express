@@ -1,0 +1,58 @@
+import groovy.transform.Field;
+
+@Field def lib_repo_url = "https://github.com/devGnode/springboot-express.git" as String
+@Field def git_credentials = "505ffe05-122c-499f-b83c-1aa544cc56e0" as String
+@Field def hasFailed
+@Field def timestamp = "" as String
+
+timestamps{
+    parameters{
+        string(name: 'VERSION', defaultValue: '1.0.0-alpha', description:'Package version')
+        string(name: 'git_branch', defaultValue: 'develop', description:'branch to push commit')
+    }
+    node{
+
+        stage("Git Checkout SCM"){
+            cleanWs();
+            deleteDir();
+
+            git branch: "feature/test-integration",
+            credentialsId: "${git_credentials}",
+            url: "${lib_repo_url}"
+        }
+
+        // soon sonar
+        docker.image("alpine-nodejs").inside("-u root") {
+
+            stage("Test build"){
+                sh 'mkdir -p /home'
+                sh 'ls -la'
+                sh 'npm run compile:prod'
+            }
+
+            stage("NPM Publish"){
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE'){
+                    sh 'npm publish'
+                }
+            }
+
+            stage("Git push version"){
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE'){
+
+                    withCredentials([usernamePassword(credentialsId: "${git_credentials}", passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+
+                        sh 'git add -f package.json'
+                        sh 'git commit -m "upgrade version"'
+                        sh 'git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/devGnode/springboot-express.git develop'
+                    }
+                }
+            }
+        }
+
+       stage("Clean"){
+            cleanWs()
+            deleteDir()
+       }
+    }
+
+}
