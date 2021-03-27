@@ -1,6 +1,6 @@
 {
   "name": "springboot-express",
-  "version": "1.0.0-alpha",
+  "version": "0.0.0-alpha",
   "description": "express-spring-boot",
   "main": "lib/Application.js",
   "types": "lib/Application.d.ts",
