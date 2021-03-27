@@ -7,7 +7,7 @@ import { SpringApplication} from "./Interfaces";
 import { Logger} from "logger20js-ts";
 import "lib-utils-ts/src/globalUtils";
 import {AbstractProperties, Properties, PropertiesJson} from "lib-utils-ts/src/file/Properties";
-import {RuntimeException} from "lib-utils-ts/src/Exception";
+import {IOException, RuntimeException} from "lib-utils-ts/src/Exception";
 import * as fs from "fs";
 import {Define} from "lib-utils-ts/src/Define";
 import {Class} from "lib-utils-ts/src/Class";
@@ -15,7 +15,7 @@ import {Constructor} from "lib-utils-ts/src/Constructor";
 import {Path} from "lib-utils-ts/src/file/Path";
 /***
  * Proxy Class
-*/
+ */
 export class Application implements SpringApplication{
 
     private static readonly INSTANCE: Application = new Application();
@@ -107,6 +107,8 @@ export class Application implements SpringApplication{
                 if (/json$/.test(path)) this.prop = new PropertiesJson();
                 else this.prop = new Properties();
                 this.prop.load(Application.getClass().getResourcesAsStream(path));
+                Logger.setPropertiesConfigHandle(this.prop);
+                this.logger.debug("Configuration '%s' was been loaded with successful",path.colorize().green);
             } catch (e) {
                 throw new RuntimeException(e);
             }
@@ -137,7 +139,7 @@ export class Application implements SpringApplication{
             });
             return out;
         }
-        throw new RuntimeException(`${path} is not a directory !`);
+        throw new IOException(`${path} is not a directory !`);
     }
     /****
      * @criticalFeature defect risk : 5/5

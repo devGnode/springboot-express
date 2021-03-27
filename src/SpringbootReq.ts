@@ -2,7 +2,7 @@ import {flombok} from "lib-utils-ts/src/flombok";
 import {List, MapType} from "lib-utils-ts/src/Interface";
 import {ArrayList} from "lib-utils-ts/src/List";
 import {Cookie} from "lib-utils-ts/src/net/Cookie";
-import {SpringbootReqImpl} from "./Interfaces";
+import {setNewCookieType, SpringbootReqImpl} from "./Interfaces";
 /***
  */
 export class SpringbootReq implements SpringbootReqImpl{
@@ -33,5 +33,7 @@ export class SpringbootReq implements SpringbootReqImpl{
 
     public getJwtToken:flombok.accessorGetFunc<MapType<string, Object>>;
     public setJwtToken:flombok.accessorSetFunc<MapType<string, Object>>;
+
+    public setNewToken:setNewCookieType;
 
 }

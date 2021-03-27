@@ -7,7 +7,7 @@ import {SpringbootReq} from "./SpringbootReq";
 export module Spring{
     /****
      * @AUTH_LEVEL
-    */
+     */
     export enum AUTH_LEVEL {
         ALL         = 0x00,
         ADMIN       = 0x01,
@@ -80,8 +80,14 @@ export module Spring{
     }
 
     export function Configuration( path:string ){
-       return function (constructor: Function){
-           Application.getInstance().loadConfiguration(path);
+        return function (constructor: Function){
+            Application.getInstance().loadConfiguration(path);
+        }
+    }
+
+    export function StaticImportation( path:string ){
+        return function (constructor: Function){
+            Application.getInstance().loadConfiguration(path);
         }
     }
 

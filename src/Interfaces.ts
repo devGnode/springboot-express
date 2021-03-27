@@ -6,7 +6,7 @@ import {Cookie} from "lib-utils-ts/src/net/Cookie";
 import {Spring} from "./Spring";
 /**
  *
-*/
+ */
 export interface ExpressSpringApplicationImpl{
     getApp( ):express.Application
     getMiddleWare( ):MiddleWare
@@ -19,7 +19,7 @@ export interface ExpressSpringApplicationImpl{
 }
 /****
  *
-*/
+ */
 export interface SpringApplication{
     getApp( ):express.Application
     init( pages_directory:string ): SpringApplication
@@ -33,4 +33,8 @@ export interface SpringbootReqImpl{
     setCookie:flombok. accessorSetFunc<List<Cookie>>;
     getJwtToken:flombok.accessorGetFunc<MapType<string, Object>>;
     setJwtToken:flombok.accessorSetFunc<MapType<string, Object>>;
+    setNewToken:setNewCookieType
 }
+/***
+ */
+export type setNewCookieType = ( ... cookie:Cookie[] ) => void
